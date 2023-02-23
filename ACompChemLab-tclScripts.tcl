@@ -27,12 +27,11 @@ proc numatoms {{mol top} {str "all"}} {
 ## Usage: dictNameCharge <molid> "<atom selection>"	##
 ## Default values:                               	##
 ## <molid> = top    <atom selection> = all	        ##
-## Dependancy: proc numatoms { }			##
 ##########################################################
 proc dictNameCharge {{mol top} {str "all"}} {
-	set n_atoms [numatoms $mol "$str"]
 	set nameChdict [dict create]
-	for {set i 0} {$i < $n_atoms} {incr i} {
+        set i_atoms [lsort -integer [[atomselect $mol "$str"] get index]]
+	foreach i $i_atoms {
         	set name [[atomselect $mol "index $i"] get name]
         	set charge [format "%.4f" [[atomselect $mol "index $i"] get charge]]
 		dict append nameChdict $name $charge
@@ -49,12 +48,11 @@ proc dictNameCharge {{mol top} {str "all"}} {
 ## Usage: dictIndexCharge <molid> "<atom selection>"	##
 ## Default values:                               	##
 ## <molid> = top    <atom selection> = all	        ##
-## Dependancy: proc numatoms { }			##
 ##########################################################
 proc dictIndexCharge {{mol top} {str "all"}} {
-	set n_atoms [numatoms $mol "$str"]
 	set indexChdict [dict create]
-	for {set i 0} {$i < $n_atoms} {incr i} {
+        set i_atoms [lsort -integer [[atomselect $mol "$str"] get index]]
+	foreach i $i_atoms {
         	set charge [format "%.4f" [[atomselect $mol "index $i"] get charge]]
 		dict append indexChdict $i $charge
 	}
@@ -68,12 +66,11 @@ proc dictIndexCharge {{mol top} {str "all"}} {
 ## Usage: dictIndexCoor <molid> "<atom selection>"  <frame >     ##
 ## Default values:                                               ##
 ## <molid> = top    <atom selection> = all  <frame> = last       ##
-## Dependancy: proc numatoms { }                                 ##
 ###################################################################
 proc dictIndexCoor {{mol top} {str "all"} {frame last}} {
-        set n_atoms [numatoms $mol "$str"]
         set indexCoordict [dict create]
-        for {set i 0} {$i < $n_atoms} {incr i} {
+        set i_atoms [lsort -integer [[atomselect $mol "$str"] get index]]
+	foreach i $i_atoms {
                 set coor [[atomselect $mol "index $i" frame $frame] get {x y z}]
                 dict append indexCoordict $i $coor
         }
@@ -85,15 +82,15 @@ proc dictIndexCoor {{mol top} {str "all"} {frame last}} {
 ##########################################################################################
 ## Create a dictionary of all atom properties in the following format  			##
 ## <index> {name <name> charge <charge> xcoor <xcoor> ycoor <ycoor> zcoor <zcoor>}      ##
-## Usage: parseAtoms <molid> "<atom selection>"  <frame >        			##
+## Usage: parseAtoms <molid> <frame> "<atom selection>"         			##
 ## Default values:                                               			##
-## <molid> = top    <atom selection> = all  <frame> = last       			##
-## Dependancy: proc numatoms { }                                 			##
+## <molid> = top    <frame> = last     <atom selection> = all      			##
 ##########################################################################################
 proc parseAtoms {{mol top} {whichframe last} {str "all"}} {
-        set n_atoms [numatoms $mol "$str"]
+        set i_atoms [lsort -integer [[atomselect $mol "$str"] get index]]
         set AllAtoms [dict create]
-        for {set i 0} {$i < $n_atoms} {incr i} {
+
+	foreach i $i_atoms {
                 dict set AllAtoms $i name [[atomselect $mol "index $i"] get name]
                 dict set AllAtoms $i charge [format "%.4f" [[atomselect $mol "index $i"] get charge]]
                 dict set AllAtoms $i xcoor [format "%.4f" [[atomselect $mol "index $i" frame $whichframe] get x ]]
